@@ -206,6 +206,54 @@
     .sh-pager-btn:disabled{opacity:.35;cursor:not-allowed}
     .sh-pager-info{font-size:.74em;color:#5a7a9a}
 
+    /* ── PROJECT SAVE / LOAD ── */
+    .proj-btn{padding:5px 11px;border-radius:4px;border:1px solid #2d4060;background:#1f2d47;color:#c0c0c0;cursor:pointer;font-size:.82em;white-space:nowrap;transition:all .15s}
+    .proj-btn:hover{border-color:#4a9eff;color:#fff}
+    .proj-btn.saved{border-color:#4caf50;color:#4caf50}
+    #currentProject{font-size:.8em;color:#5a7a9a;max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex-shrink:0}
+    /* large modals */
+    .big-modal{position:fixed;inset:0;background:rgba(0,0,0,.65);display:none;align-items:flex-start;justify-content:center;z-index:600;padding-top:60px}
+    .big-modal.show{display:flex}
+    .big-modal-box{background:#161b27;border:1px solid #2d4060;border-radius:8px;width:520px;max-height:80vh;display:flex;flex-direction:column}
+    .bm-hdr{padding:14px 18px;border-bottom:1px solid #1f2d47;display:flex;justify-content:space-between;align-items:center}
+    .bm-hdr h3{font-size:.95em;color:#4a9eff}
+    .bm-close{background:none;border:none;color:#5a7a9a;font-size:1.2em;cursor:pointer;line-height:1}
+    .bm-close:hover{color:#e94560}
+    .bm-body{overflow-y:auto;flex:1;padding:14px 18px}
+    .bm-ftr{padding:10px 18px;border-top:1px solid #1f2d47;display:flex;gap:8px;justify-content:flex-end}
+    .bm-input{width:100%;background:#1f2d47;border:1px solid #2d4060;color:#e0e0e0;padding:6px 9px;border-radius:4px;font-size:.85em;margin-bottom:8px}
+    .bm-input:focus{outline:none;border-color:#4a9eff}
+    .bm-input-label{font-size:.76em;color:#5a7a9a;margin-bottom:4px;display:block}
+    /* project list */
+    .proj-list-item{padding:9px 12px;border-radius:5px;border:1px solid #1f2d47;margin-bottom:7px;cursor:pointer;display:flex;align-items:center;gap:10px;transition:background .12s}
+    .proj-list-item:hover{background:#1f2d47;border-color:#2d4060}
+    .pli-info{flex:1;min-width:0}
+    .pli-name{font-weight:600;font-size:.87em;color:#dde}
+    .pli-meta{font-size:.74em;color:#5a7a9a;margin-top:2px}
+    .pli-actions{display:flex;gap:6px;flex-shrink:0}
+    .pli-load{padding:3px 10px;background:#0f2233;border:1px solid #1f4d6f;border-radius:3px;color:#4a9eff;font-size:.74em;cursor:pointer}
+    .pli-load:hover{background:#1f3d5f}
+    .pli-del{padding:3px 8px;background:transparent;border:1px solid #4a2020;border-radius:3px;color:#e94560;font-size:.74em;cursor:pointer}
+    .pli-del:hover{background:#2a1010}
+    /* inventory tab */
+    #inv-content{display:none;flex-direction:column;flex:1;overflow:hidden;min-height:0}
+    .inv-hdr-bar{padding:8px 10px;border-bottom:1px solid #1f2d47;flex-shrink:0;font-size:.73em;color:#5a7a9a;display:flex;justify-content:space-between;align-items:center}
+    .inv-add-btn{padding:3px 9px;background:#1b4d2e;border:1px solid #2e7d4f;border-radius:3px;color:#4caf50;font-size:.76em;cursor:pointer}
+    .inv-add-btn:hover{background:#2e4a38}
+    .inv-list{overflow-y:auto;flex:1}
+    .inv-empty{padding:20px 10px;text-align:center;color:#3a5a7a;font-size:.82em}
+    .inv-item{padding:7px 9px;border-bottom:1px solid #1a2234;display:flex;align-items:center;gap:7px;font-size:.78em}
+    .inv-item:hover{background:#1a2234}
+    .inv-item-name{flex:1;min-width:0}
+    .inv-item-main{color:#dde;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .inv-item-sku{color:#4a6a8a;font-size:.88em}
+    .inv-qty-wrap{display:flex;align-items:center;gap:4px;flex-shrink:0}
+    .inv-qty-input{width:46px;background:#1f2d47;border:1px solid #2d4060;color:#e0e0e0;padding:2px 4px;border-radius:3px;font-size:.8em;text-align:center}
+    .inv-qty-unit{color:#5a7a9a;font-size:.8em}
+    .inv-del-btn{background:none;border:none;color:#5a7a9a;cursor:pointer;font-size:.85em;padding:0 2px;flex-shrink:0}
+    .inv-del-btn:hover{color:#e94560}
+    .inv-ftr{padding:8px 10px;border-top:1px solid #1f2d47;font-size:.73em;color:#5a7a9a;flex-shrink:0}
+
     /* ── CART BADGE in header ── */
     .cart-indicator{display:none;align-items:center;gap:5px;padding:5px 10px;border-radius:4px;border:1px solid #2d4060;background:#1f2d47;font-size:.8em;color:#ccc;cursor:pointer;transition:all .15s}
     .cart-indicator:hover{border-color:#4caf50;color:#4caf50}
@@ -224,6 +272,9 @@
     <button class="tool-btn" id="toolDelete" onclick="setTool('delete')">✕ Delete <span class="kbd">D</span></button>
     <button class="tool-btn" style="margin-left:8px" onclick="clearCanvas()">⟳ Clear</button>
     <button class="tool-btn green" onclick="exportCSV()">⬇ CSV</button>
+    <span id="currentProject" title="Current project"></span>
+    <button class="proj-btn" id="btnSave" onclick="openSaveModal()" title="Save project">💾 Save</button>
+    <button class="proj-btn" onclick="openLoadModal()" title="Open saved projects">📂 Projects</button>
     <div class="cart-indicator" id="cartIndicator" onclick="switchTab('sh')" title="View SupplyHouse.com cart">
       🛒 Cart <span class="cart-count" id="cartCount">0</span>
     </div>
@@ -238,6 +289,7 @@
     <div class="panel-tabs">
       <div class="panel-tab active" id="tab-local" onclick="switchTab('local')">Local Catalog</div>
       <div class="panel-tab" id="tab-sh" onclick="switchTab('sh')">SupplyHouse.com</div>
+      <div class="panel-tab" id="tab-inv" onclick="switchTab('inv')">Inventory</div>
     </div>
 
     <!-- ── LOCAL CATALOG ── -->
@@ -289,7 +341,57 @@
       </div>
 
     </div><!-- /sh-content -->
+
+    <!-- ── INVENTORY TAB ── -->
+    <div id="inv-content">
+      <div class="inv-hdr-bar">
+        <span id="inv-count">Parts on hand</span>
+        <button class="inv-add-btn" onclick="invAddFromBom()">+ From BOM</button>
+      </div>
+      <div class="inv-list" id="inv-list">
+        <div class="inv-empty">No inventory yet.<br>Click "+ From BOM" to import the current parts list.</div>
+      </div>
+      <div class="inv-ftr" id="inv-ftr"></div>
+    </div>
+
+  </div><!-- /catalog-panel -->
+
+<!-- ══ SAVE PROJECT MODAL ══ -->
+<div class="big-modal" id="saveModal">
+  <div class="big-modal-box" style="width:380px">
+    <div class="bm-hdr">
+      <h3>💾 Save Project</h3>
+      <button class="bm-close" onclick="closeSaveModal()">✕</button>
+    </div>
+    <div class="bm-body">
+      <label class="bm-input-label">Project Name</label>
+      <input class="bm-input" id="saveProjectName" type="text" placeholder="e.g. Smith Residence Hydronic">
+      <label class="bm-input-label">Description (optional)</label>
+      <input class="bm-input" id="saveProjectDesc" type="text" placeholder="Notes about this project…">
+      <div id="save-msg" style="font-size:.78em;color:#4caf50;display:none;margin-top:4px"></div>
+    </div>
+    <div class="bm-ftr">
+      <button class="mb-cancel" onclick="closeSaveModal()">Cancel</button>
+      <button class="mb-ok" onclick="doSaveProject()">Save</button>
+    </div>
   </div>
+</div>
+
+<!-- ══ LOAD / PROJECTS MODAL ══ -->
+<div class="big-modal" id="loadModal">
+  <div class="big-modal-box">
+    <div class="bm-hdr">
+      <h3>📂 Saved Projects</h3>
+      <button class="bm-close" onclick="closeLoadModal()">✕</button>
+    </div>
+    <div class="bm-body" id="projListBody">
+      <div style="text-align:center;color:#3a5a7a;padding:20px">Loading…</div>
+    </div>
+    <div class="bm-ftr">
+      <button class="mb-cancel" onclick="closeLoadModal()">Close</button>
+    </div>
+  </div>
+</div>
 
   <!-- CANVAS -->
   <div class="canvas-wrap" id="canvasWrap"
@@ -909,6 +1011,221 @@ document.getElementById('canvasWrap').addEventListener('mousedown',e=>{
 });
 
 // ═══════════════════════════════════════════════════════════════════
+//  PROJECT SAVE / LOAD
+// ═══════════════════════════════════════════════════════════════════
+let currentProjectId   = null;
+let currentProjectName = '';
+
+function getCanvasState() {
+  return { components: components.map(c => ({...c})), connections: connections.map(c => ({...c})) };
+}
+
+function getBomParts() {
+  const agg = {};
+  components.forEach(c => {
+    if (!agg[c.itemId]) agg[c.itemId] = { item_id:c.itemId, name:c.name, sku:c.itemId, brand:'', price:c.price, unit:c.unit, qty:0 };
+    agg[c.itemId].qty += c.qty;
+  });
+  return Object.values(agg);
+}
+
+function restoreCanvasState(state) {
+  // Silent clear
+  components = []; connections = [];
+  const outer = document.getElementById('canvas-outer');
+  outer.innerHTML = '<svg id="svg-layer" xmlns="http://www.w3.org/2000/svg"><defs><marker id="arr" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#3d5a7a"/></marker></defs></svg>';
+  nextId = 1;
+
+  const parsed = typeof state === 'string' ? JSON.parse(state) : state;
+  const comps  = parsed?.components || [];
+  const conns  = parsed?.connections || [];
+  const maxId  = Math.max(0, ...comps.map(c=>c.id||0), ...conns.map(c=>c.id||0));
+  nextId = maxId + 1;
+
+  comps.forEach(c => { components.push(c); mountComponent(c); });
+  conns.forEach(c => { connections.push(c); });
+  redrawConns(); updateBOM(); updateStatus();
+}
+
+// ── Save modal ───────────────────────────────────────────────────
+function openSaveModal() {
+  document.getElementById('saveProjectName').value = currentProjectName || document.getElementById('projectName').value || '';
+  document.getElementById('saveProjectDesc').value = '';
+  document.getElementById('save-msg').style.display = 'none';
+  document.getElementById('saveModal').classList.add('show');
+  document.getElementById('saveProjectName').focus();
+}
+function closeSaveModal() { document.getElementById('saveModal').classList.remove('show'); }
+
+async function doSaveProject() {
+  const name = document.getElementById('saveProjectName').value.trim();
+  if (!name) { document.getElementById('saveProjectName').focus(); return; }
+  const desc   = document.getElementById('saveProjectDesc').value.trim();
+  const canvas = JSON.stringify(getCanvasState());
+  const parts  = getBomParts();
+
+  try {
+    let r, d;
+    if (currentProjectId) {
+      r = await fetch(`${API}/api/db/projects/${currentProjectId}`, {
+        method: 'PUT', headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({ name, description: desc, canvas_json: canvas, parts }),
+      });
+      d = await r.json();
+    } else {
+      r = await fetch(`${API}/api/db/projects`, {
+        method: 'POST', headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({ name, description: desc, canvas_json: canvas, parts }),
+      });
+      d = await r.json();
+      if (d.id) currentProjectId = d.id;
+    }
+    currentProjectName = name;
+    document.getElementById('projectName').value = name;
+    document.getElementById('currentProject').textContent = name;
+    document.getElementById('btnSave').classList.add('saved');
+    setTimeout(() => document.getElementById('btnSave').classList.remove('saved'), 2000);
+    const msg = document.getElementById('save-msg');
+    msg.textContent = '✓ Saved'; msg.style.display = '';
+    setTimeout(() => closeSaveModal(), 800);
+  } catch (err) {
+    alert('Save failed: ' + err.message);
+  }
+}
+
+// ── Load / Projects modal ────────────────────────────────────────
+async function openLoadModal() {
+  document.getElementById('loadModal').classList.add('show');
+  await refreshProjList();
+}
+function closeLoadModal() { document.getElementById('loadModal').classList.remove('show'); }
+
+async function refreshProjList() {
+  const body = document.getElementById('projListBody');
+  body.innerHTML = '<div style="text-align:center;color:#3a5a7a;padding:20px">Loading…</div>';
+  try {
+    const r = await fetch(`${API}/api/db/projects`);
+    const projects = await r.json();
+    if (!projects.length) {
+      body.innerHTML = '<div style="text-align:center;color:#3a5a7a;padding:30px">No saved projects yet.</div>';
+      return;
+    }
+    body.innerHTML = projects.map(p => {
+      const parts = p.parts_count || '';
+      const date  = new Date(p.updated_at).toLocaleDateString();
+      return `<div class="proj-list-item">
+        <div class="pli-info">
+          <div class="pli-name">${p.name}</div>
+          <div class="pli-meta">${p.description ? p.description + ' · ' : ''}Saved ${date}</div>
+        </div>
+        <div class="pli-actions">
+          <button class="pli-load" onclick="doLoadProject(${p.id},'${p.name.replace(/'/g,"\\'")}')">Load</button>
+          <button class="pli-del"  onclick="doDeleteProject(${p.id}, this)">✕</button>
+        </div>
+      </div>`;
+    }).join('');
+  } catch {
+    body.innerHTML = '<div style="text-align:center;color:#e94560;padding:20px">Server offline</div>';
+  }
+}
+
+async function doLoadProject(id, name) {
+  try {
+    const r = await fetch(`${API}/api/db/projects/${id}`);
+    const p = await r.json();
+    restoreCanvasState(p.canvas_json);
+    currentProjectId   = id;
+    currentProjectName = name;
+    document.getElementById('projectName').value   = name;
+    document.getElementById('currentProject').textContent = name;
+    closeLoadModal();
+  } catch (err) { alert('Load failed: ' + err.message); }
+}
+
+async function doDeleteProject(id, btn) {
+  if (!confirm('Delete this project?')) return;
+  await fetch(`${API}/api/db/projects/${id}`, { method: 'DELETE' });
+  if (currentProjectId === id) { currentProjectId = null; currentProjectName = ''; document.getElementById('currentProject').textContent = ''; }
+  btn.closest('.proj-list-item').remove();
+}
+
+// Auto-save hint when canvas changes
+function markUnsaved() {
+  if (currentProjectId) document.getElementById('btnSave').classList.remove('saved');
+}
+
+// ═══════════════════════════════════════════════════════════════════
+//  INVENTORY
+// ═══════════════════════════════════════════════════════════════════
+async function loadInventory() {
+  const list = document.getElementById('inv-list');
+  const ftr  = document.getElementById('inv-ftr');
+  list.innerHTML = '<div class="inv-empty">Loading…</div>';
+  try {
+    const r   = await fetch(`${API}/api/db/inventory`);
+    const inv = await r.json();
+    document.getElementById('inv-count').textContent = `${inv.length} item${inv.length===1?'':'s'} on hand`;
+    if (!inv.length) {
+      list.innerHTML = '<div class="inv-empty">No inventory yet.<br>Click "+ From BOM" to import the current parts list.</div>';
+      ftr.textContent = '';
+      return;
+    }
+    const totalValue = inv.reduce((s,i) => s + (i.price_paid||0)*(i.qty_on_hand||0), 0);
+    list.innerHTML = inv.map(item => `
+      <div class="inv-item" id="inv-row-${item.id}">
+        <div class="inv-item-name">
+          <div class="inv-item-main" title="${item.name}">${item.name.length>22?item.name.slice(0,21)+'…':item.name}</div>
+          <div class="inv-item-sku">${item.sku||item.item_id}${item.location?' · '+item.location:''}</div>
+        </div>
+        <div class="inv-qty-wrap">
+          <input class="inv-qty-input" type="number" min="0" step="0.1" value="${item.qty_on_hand}"
+            onchange="invUpdateQty(${item.id}, this.value)" title="Qty on hand">
+          <span class="inv-qty-unit">${item.unit}</span>
+        </div>
+        <button class="inv-del-btn" onclick="invDelete(${item.id})" title="Remove">✕</button>
+      </div>`).join('');
+    ftr.textContent = `Stock value: $${totalValue.toFixed(2)}`;
+  } catch {
+    list.innerHTML = '<div class="inv-empty">Server offline</div>';
+  }
+}
+
+async function invUpdateQty(id, val) {
+  await fetch(`${API}/api/db/inventory/${id}`, {
+    method:'PUT', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({ qty_on_hand: parseFloat(val)||0 }),
+  });
+  // Refresh footer total only
+  loadInventory();
+}
+
+async function invDelete(id) {
+  await fetch(`${API}/api/db/inventory/${id}`, { method:'DELETE' });
+  document.getElementById(`inv-row-${id}`)?.remove();
+  const remaining = document.querySelectorAll('[id^="inv-row-"]').length;
+  document.getElementById('inv-count').textContent = `${remaining} item${remaining===1?'':'s'} on hand`;
+  if (!remaining) document.getElementById('inv-list').innerHTML = '<div class="inv-empty">No inventory yet.</div>';
+}
+
+async function invAddFromBom() {
+  const parts = getBomParts();
+  if (!parts.length) { alert('Add parts to the canvas first.'); return; }
+  for (const p of parts) {
+    await fetch(`${API}/api/db/inventory`, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ item_id:p.item_id, name:p.name, sku:p.sku||p.item_id, brand:p.brand||'', price_paid:p.price, unit:p.unit, qty_on_hand:0 }),
+    });
+  }
+  loadInventory();
+}
+
+// ── Patch addComponent + deleteComp to mark unsaved ─────────────
+const _origAdd = addComponent;
+addComponent = function(...a){ _origAdd(...a); markUnsaved(); };
+const _origDel = deleteComp;
+deleteComp = function(...a){ _origDel(...a); markUnsaved(); };
+
+// ═══════════════════════════════════════════════════════════════════
 //  INIT
 // ═══════════════════════════════════════════════════════════════════
 renderCatalog();
@@ -926,12 +1243,13 @@ let shLoggedIn     = false;
 
 // ── Tab switching ────────────────────────────────────────────────
 function switchTab(tab) {
-  const isLocal = tab === 'local';
-  document.getElementById('tab-local').classList.toggle('active',  isLocal);
-  document.getElementById('tab-sh').classList.toggle('active',    !isLocal);
-  document.getElementById('local-content').style.display = isLocal ? 'flex' : 'none';
-  document.getElementById('sh-content').style.display    = isLocal ? 'none' : 'flex';
-  if (!isLocal) shCheckStatus();
+  ['local','sh','inv'].forEach(t => {
+    document.getElementById(`tab-${t}`).classList.toggle('active', t === tab);
+    const el = document.getElementById(`${t}-content`);
+    if (el) el.style.display = t === tab ? 'flex' : 'none';
+  });
+  if (tab === 'sh')  shCheckStatus();
+  if (tab === 'inv') loadInventory();
 }
 
 // ── Status strip helper ──────────────────────────────────────────

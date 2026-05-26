@@ -1,3 +1,6 @@
 node_modules/
 .env
 *.log
+hydrodesign.db
+hydrodesign.db-shm
+hydrodesign.db-wal
