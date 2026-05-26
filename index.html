@@ -26,7 +26,7 @@
     .main{display:flex;flex:1;overflow:hidden}
 
     /* ── CATALOG ── */
-    .catalog-panel{width:255px;background:#161b27;border-right:2px solid #1f2d47;overflow-y:auto;flex-shrink:0;display:flex;flex-direction:column}
+    .catalog-panel{width:255px;background:#161b27;border-right:2px solid #1f2d47;overflow:hidden;flex-shrink:0;display:flex;flex-direction:column}
     .catalog-title{padding:9px 14px;font-size:0.72em;text-transform:uppercase;letter-spacing:1.2px;color:#5a7a9a;border-bottom:1px solid #1f2d47;flex-shrink:0}
     .catalog-search{padding:8px 10px;border-bottom:1px solid #1f2d47;flex-shrink:0}
     .catalog-search input{width:100%;background:#1f2d47;border:1px solid #2d4060;color:#e0e0e0;padding:5px 9px;border-radius:4px;font-size:0.83em}
@@ -136,6 +136,81 @@
     ::-webkit-scrollbar-track{background:#0d1117}
     ::-webkit-scrollbar-thumb{background:#2d4060;border-radius:3px}
     ::-webkit-scrollbar-thumb:hover{background:#3d5a7a}
+
+    /* ── CATALOG PANEL TABS ── */
+    .panel-tabs{display:flex;border-bottom:2px solid #1f2d47;flex-shrink:0}
+    .panel-tab{flex:1;padding:8px 4px;text-align:center;cursor:pointer;font-size:.77em;color:#5a7a9a;border-bottom:2px solid transparent;margin-bottom:-2px;transition:all .15s;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding:8px 6px}
+    .panel-tab:hover{color:#c0c0c0}
+    .panel-tab.active{color:#e0e0e0;border-bottom-color:#4a9eff}
+    #local-content{display:flex;flex-direction:column;flex:1;overflow:hidden;min-height:0}
+    #sh-content{display:none;flex-direction:column;flex:1;overflow:hidden;min-height:0}
+    .catalog-body{overflow-y:auto;flex:1}
+
+    /* ── SUPPLY HOUSE AUTH BAR ── */
+    .sh-auth-section{padding:10px;border-bottom:1px solid #1f2d47;flex-shrink:0}
+    .sh-auth-section .sh-label{font-size:.72em;color:#5a7a9a;margin-bottom:6px}
+    .sh-field{width:100%;background:#1f2d47;border:1px solid #2d4060;color:#e0e0e0;padding:5px 8px;border-radius:4px;font-size:.82em;margin-bottom:5px}
+    .sh-field:focus{outline:none;border-color:#4a9eff}
+    .sh-sign-in-btn{width:100%;padding:6px;background:#4a9eff;border:none;border-radius:4px;color:#fff;cursor:pointer;font-weight:600;font-size:.82em;transition:opacity .15s}
+    .sh-sign-in-btn:hover{opacity:.85}
+    .sh-sign-in-btn:disabled{opacity:.5;cursor:default}
+    .sh-err{color:#e94560;font-size:.74em;margin-top:4px;display:none}
+    .sh-user-row{display:flex;align-items:center;gap:8px}
+    .sh-user-name{font-size:.82em;color:#4caf50;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .sh-cart-chip{background:#1f2d47;border:1px solid #2d4060;border-radius:10px;padding:2px 8px;font-size:.74em;color:#c0c0c0;cursor:pointer;white-space:nowrap}
+    .sh-cart-chip:hover{border-color:#4a9eff;color:#fff}
+    .sh-signout-btn{font-size:.74em;color:#5a7a9a;background:none;border:none;cursor:pointer;padding:0;flex-shrink:0}
+    .sh-signout-btn:hover{color:#e94560}
+
+    /* ── SUPPLY HOUSE SEARCH ── */
+    .sh-search-bar{padding:8px 10px;border-bottom:1px solid #1f2d47;flex-shrink:0;display:flex;gap:5px}
+    .sh-search-input{flex:1;background:#1f2d47;border:1px solid #2d4060;color:#e0e0e0;padding:5px 8px;border-radius:4px;font-size:.82em}
+    .sh-search-input:focus{outline:none;border-color:#4a9eff}
+    .sh-search-go{padding:5px 10px;background:#1f2d47;border:1px solid #2d4060;border-radius:4px;color:#ccc;cursor:pointer;font-size:.82em}
+    .sh-search-go:hover{border-color:#4a9eff;color:#fff}
+
+    /* ── SUPPLY HOUSE STATUS STRIP ── */
+    .sh-status-strip{padding:5px 10px;font-size:.73em;text-align:center;border-bottom:1px solid #1a2234;flex-shrink:0;display:none}
+    .sh-status-strip.ok{color:#4caf50;background:#0a1f12}
+    .sh-status-strip.err{color:#e94560;background:#1f0a0a}
+    .sh-status-strip.info{color:#4a9eff;background:#0a1220}
+
+    /* ── SUPPLY HOUSE RESULTS ── */
+    .sh-results{overflow-y:auto;flex:1}
+    .sh-empty{padding:20px 10px;text-align:center;color:#3a5a7a;font-size:.82em}
+    .sh-loading{padding:20px 10px;text-align:center;color:#4a9eff;font-size:.82em}
+    .sh-result{padding:7px 9px;border-bottom:1px solid #1a2234;display:flex;gap:7px;transition:background .12s}
+    .sh-result:hover{background:#1a2234}
+    .sh-result-img{width:44px;height:44px;object-fit:contain;border-radius:3px;background:#0d1117;flex-shrink:0;border:1px solid #1f2d47}
+    .sh-result-img-placeholder{width:44px;height:44px;background:#1f2d47;border-radius:3px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:18px}
+    .sh-result-body{flex:1;min-width:0}
+    .sh-result-name{font-size:.79em;font-weight:500;color:#dde;line-height:1.25;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+    .sh-result-meta{display:flex;gap:5px;align-items:baseline;margin-top:2px;flex-wrap:wrap}
+    .sh-result-price{font-size:.82em;color:#4caf50;font-weight:700}
+    .sh-result-list{font-size:.74em;color:#5a7a9a;text-decoration:line-through}
+    .sh-result-sku{font-size:.72em;color:#4a6a8a}
+    .sh-result-brand{font-size:.72em;color:#6a8aaa}
+    .sh-result-oos{font-size:.72em;color:#e94560}
+    .sh-result-actions{display:flex;flex-direction:column;gap:3px;justify-content:center;flex-shrink:0}
+    .sh-btn-d{padding:3px 7px;background:#0f2233;border:1px solid #1f4d6f;border-radius:3px;color:#4a9eff;font-size:.7em;cursor:pointer;white-space:nowrap;transition:all .12s}
+    .sh-btn-d:hover{background:#1f3d5f}
+    .sh-btn-c{padding:3px 7px;background:#0f2a18;border:1px solid #1f5a30;border-radius:3px;color:#4caf50;font-size:.7em;cursor:pointer;white-space:nowrap;transition:all .12s}
+    .sh-btn-c:hover{background:#1f4a28}
+    .sh-btn-c:disabled{opacity:.45;cursor:not-allowed}
+    .sh-btn-c.added{background:#1b4d2e;color:#81c784}
+
+    /* ── PAGINATION ── */
+    .sh-pager{display:flex;justify-content:space-between;align-items:center;padding:7px 10px;border-top:1px solid #1f2d47;flex-shrink:0;display:none}
+    .sh-pager-btn{padding:4px 12px;background:#1f2d47;border:1px solid #2d4060;border-radius:3px;color:#ccc;font-size:.77em;cursor:pointer}
+    .sh-pager-btn:hover:not(:disabled){background:#2d4060}
+    .sh-pager-btn:disabled{opacity:.35;cursor:not-allowed}
+    .sh-pager-info{font-size:.74em;color:#5a7a9a}
+
+    /* ── CART BADGE in header ── */
+    .cart-indicator{display:none;align-items:center;gap:5px;padding:5px 10px;border-radius:4px;border:1px solid #2d4060;background:#1f2d47;font-size:.8em;color:#ccc;cursor:pointer;transition:all .15s}
+    .cart-indicator:hover{border-color:#4caf50;color:#4caf50}
+    .cart-indicator.has-items{border-color:#4caf50;color:#4caf50}
+    .cart-count{background:#4caf50;color:#0d1117;border-radius:9px;padding:0 5px;font-size:.8em;font-weight:700}
   </style>
 </head>
 <body>
@@ -149,15 +224,71 @@
     <button class="tool-btn" id="toolDelete" onclick="setTool('delete')">✕ Delete <span class="kbd">D</span></button>
     <button class="tool-btn" style="margin-left:8px" onclick="clearCanvas()">⟳ Clear</button>
     <button class="tool-btn green" onclick="exportCSV()">⬇ CSV</button>
+    <div class="cart-indicator" id="cartIndicator" onclick="switchTab('sh')" title="View SupplyHouse.com cart">
+      🛒 Cart <span class="cart-count" id="cartCount">0</span>
+    </div>
   </div>
 </header>
 
 <div class="main">
-  <!-- CATALOG -->
+  <!-- CATALOG + SUPPLY HOUSE PANEL -->
   <div class="catalog-panel">
-    <div class="catalog-title">Parts Catalog</div>
-    <div class="catalog-search"><input type="text" id="catSearch" placeholder="Search parts…" oninput="filterCatalog(this.value)"></div>
-    <div class="catalog-body" id="catalogBody"></div>
+
+    <!-- Tab switcher -->
+    <div class="panel-tabs">
+      <div class="panel-tab active" id="tab-local" onclick="switchTab('local')">Local Catalog</div>
+      <div class="panel-tab" id="tab-sh" onclick="switchTab('sh')">SupplyHouse.com</div>
+    </div>
+
+    <!-- ── LOCAL CATALOG ── -->
+    <div id="local-content">
+      <div class="catalog-title">Parts Catalog</div>
+      <div class="catalog-search"><input type="text" id="catSearch" placeholder="Search parts…" oninput="filterCatalog(this.value)"></div>
+      <div class="catalog-body" id="catalogBody"></div>
+    </div>
+
+    <!-- ── SUPPLY HOUSE TAB ── -->
+    <div id="sh-content">
+
+      <!-- Auth: login form / user bar -->
+      <div class="sh-auth-section" id="sh-login-section">
+        <div class="sh-label">Sign in to SupplyHouse.com</div>
+        <input class="sh-field" type="email"    id="sh-email" placeholder="Email address">
+        <input class="sh-field" type="password" id="sh-pass"  placeholder="Password">
+        <button class="sh-sign-in-btn" id="sh-login-btn" onclick="shLogin()">Sign In</button>
+        <div class="sh-err" id="sh-login-err"></div>
+      </div>
+      <div class="sh-auth-section" id="sh-user-section" style="display:none">
+        <div class="sh-user-row">
+          <span class="sh-user-name" id="sh-user-label"></span>
+          <div class="sh-cart-chip" id="sh-cart-chip" onclick="shOpenCart()">🛒 <span id="sh-cart-label">Cart</span></div>
+          <button class="sh-signout-btn" onclick="shLogout()">Sign out</button>
+        </div>
+      </div>
+
+      <!-- Status strip -->
+      <div class="sh-status-strip" id="sh-status"></div>
+
+      <!-- Search bar -->
+      <div class="sh-search-bar">
+        <input class="sh-search-input" id="sh-q" type="text" placeholder="Search SupplyHouse.com…"
+               onkeydown="if(event.key==='Enter')shSearch()">
+        <button class="sh-search-go" onclick="shSearch()">Go</button>
+      </div>
+
+      <!-- Results list -->
+      <div class="sh-results" id="sh-results">
+        <div class="sh-empty">Search for pumps, valves, fittings, tubing…</div>
+      </div>
+
+      <!-- Pagination -->
+      <div class="sh-pager" id="sh-pager">
+        <button class="sh-pager-btn" id="sh-prev" onclick="shPage(-1)" disabled>← Prev</button>
+        <span class="sh-pager-info" id="sh-pager-info">Page 1</span>
+        <button class="sh-pager-btn" id="sh-next" onclick="shPage(1)">Next →</button>
+      </div>
+
+    </div><!-- /sh-content -->
   </div>
 
   <!-- CANVAS -->
@@ -782,6 +913,278 @@ document.getElementById('canvasWrap').addEventListener('mousedown',e=>{
 // ═══════════════════════════════════════════════════════════════════
 renderCatalog();
 updateStatus();
+
+// ═══════════════════════════════════════════════════════════════════
+//  SUPPLY HOUSE INTEGRATION
+// ═══════════════════════════════════════════════════════════════════
+const API = 'http://localhost:3001';
+let shPage_current = 0;
+let shLastQuery    = '';
+let shTotal        = 0;
+let shDebounce     = null;
+let shLoggedIn     = false;
+
+// ── Tab switching ────────────────────────────────────────────────
+function switchTab(tab) {
+  const isLocal = tab === 'local';
+  document.getElementById('tab-local').classList.toggle('active',  isLocal);
+  document.getElementById('tab-sh').classList.toggle('active',    !isLocal);
+  document.getElementById('local-content').style.display = isLocal ? 'flex' : 'none';
+  document.getElementById('sh-content').style.display    = isLocal ? 'none' : 'flex';
+  if (!isLocal) shCheckStatus();
+}
+
+// ── Status strip helper ──────────────────────────────────────────
+function shStatus(msg, type='info') {
+  const el = document.getElementById('sh-status');
+  el.textContent = msg;
+  el.className   = `sh-status-strip ${type}`;
+  el.style.display = msg ? '' : 'none';
+}
+
+// ── Check server + session ───────────────────────────────────────
+async function shCheckStatus() {
+  try {
+    const r = await fetch(`${API}/api/status`);
+    if (!r.ok) { shStatus('Server offline — run: node server.js', 'err'); return; }
+    const d = await r.json();
+    if (d.loggedIn) shSetUser(d.user);
+    else            shClearUser();
+  } catch {
+    shStatus('Server offline — run: node server.js', 'err');
+  }
+}
+
+// ── Login ────────────────────────────────────────────────────────
+async function shLogin() {
+  const email = document.getElementById('sh-email').value.trim();
+  const pass  = document.getElementById('sh-pass').value;
+  const errEl = document.getElementById('sh-login-err');
+  const btn   = document.getElementById('sh-login-btn');
+  errEl.style.display = 'none';
+  if (!email || !pass) { shShowErr('Enter email and password'); return; }
+
+  btn.disabled    = true;
+  btn.textContent = 'Signing in…';
+  shStatus('Signing in…', 'info');
+  try {
+    const r = await fetch(`${API}/api/login`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password: pass }),
+    });
+    const d = await r.json();
+    if (!r.ok) { shShowErr(d.error || 'Login failed'); shStatus(''); return; }
+    shSetUser(d.user);
+    document.getElementById('sh-pass').value = '';
+    shStatus('');
+  } catch {
+    shShowErr('Cannot reach server');
+  } finally {
+    btn.disabled    = false;
+    btn.textContent = 'Sign In';
+  }
+}
+
+function shShowErr(msg) {
+  const el = document.getElementById('sh-login-err');
+  el.textContent   = msg;
+  el.style.display = '';
+  shStatus('');
+}
+
+// ── Logout ───────────────────────────────────────────────────────
+async function shLogout() {
+  try { await fetch(`${API}/api/logout`, { method: 'POST' }); } catch {}
+  shClearUser();
+  shStatus('Signed out', 'info');
+  setTimeout(() => shStatus(''), 2000);
+}
+
+// ── Session UI helpers ───────────────────────────────────────────
+function shSetUser(user) {
+  shLoggedIn = true;
+  document.getElementById('sh-login-section').style.display = 'none';
+  document.getElementById('sh-user-section').style.display  = '';
+  document.getElementById('sh-user-label').textContent      = user.name || user.email;
+  document.getElementById('cartIndicator').style.display    = 'flex';
+  shRefreshCartCount();
+}
+
+function shClearUser() {
+  shLoggedIn = false;
+  document.getElementById('sh-login-section').style.display = '';
+  document.getElementById('sh-user-section').style.display  = 'none';
+  document.getElementById('cartIndicator').style.display    = 'none';
+  document.getElementById('cartCount').textContent          = '0';
+  document.getElementById('cartIndicator').classList.remove('has-items');
+}
+
+// ── Cart count ───────────────────────────────────────────────────
+async function shRefreshCartCount() {
+  try {
+    const r = await fetch(`${API}/api/cart`);
+    const d = await r.json();
+    const n = d.count || 0;
+    document.getElementById('cartCount').textContent  = n;
+    document.getElementById('sh-cart-label').textContent = `Cart (${n})`;
+    document.getElementById('cartIndicator').classList.toggle('has-items', n > 0);
+  } catch {}
+}
+
+function shOpenCart() {
+  window.open('https://www.supplyhouse.com/cart', '_blank');
+}
+
+// ── Live search (debounced on input, immediate on Enter/button) ──
+document.addEventListener('DOMContentLoaded', () => {
+  const inp = document.getElementById('sh-q');
+  if (inp) {
+    inp.addEventListener('input', () => {
+      clearTimeout(shDebounce);
+      shDebounce = setTimeout(() => { if (inp.value.trim().length > 2) shSearch(); }, 480);
+    });
+  }
+});
+
+async function shSearch(resetPage = true) {
+  const q = document.getElementById('sh-q').value.trim();
+  if (!q) return;
+  if (resetPage) shPage_current = 0;
+  shLastQuery = q;
+
+  const results = document.getElementById('sh-results');
+  results.innerHTML = '<div class="sh-loading">Searching…</div>';
+  document.getElementById('sh-pager').style.display = 'none';
+  shStatus('');
+
+  try {
+    const r = await fetch(`${API}/api/search?q=${encodeURIComponent(q)}&page=${shPage_current}`);
+    if (!r.ok) {
+      const e = await r.json().catch(() => ({ error: r.statusText }));
+      results.innerHTML = `<div class="sh-empty">Error: ${e.error}</div>`;
+      return;
+    }
+    const d = await r.json();
+    shTotal = d.total || 0;
+    shRenderResults(d.products || []);
+  } catch {
+    results.innerHTML = '<div class="sh-empty">Server offline — run: node server.js</div>';
+  }
+}
+
+function shPage(dir) {
+  shPage_current = Math.max(0, shPage_current + dir);
+  shSearch(false);
+}
+
+// ── Render results ───────────────────────────────────────────────
+function shRenderResults(products) {
+  const el = document.getElementById('sh-results');
+  if (!products.length) {
+    el.innerHTML = '<div class="sh-empty">No results found. Try a different search term.</div>';
+    return;
+  }
+
+  el.innerHTML = products.map((p, i) => {
+    const imgHtml = p.image
+      ? `<img class="sh-result-img" src="${p.image}" alt="" onerror="this.outerHTML='<div class=\\'sh-result-img-placeholder\\'>📦</div>'">`
+      : `<div class="sh-result-img-placeholder">📦</div>`;
+    const saleTag = (p.listPrice > p.price && p.listPrice > 0)
+      ? `<span class="sh-result-list">$${p.listPrice.toFixed(2)}</span>` : '';
+    const priceHtml = p.price > 0
+      ? `<span class="sh-result-price">$${p.price.toFixed(2)}</span>${saleTag}`
+      : `<span class="sh-result-sku">Price on request</span>`;
+    const oosHtml = !p.inStock ? `<span class="sh-result-oos">Out of stock</span>` : '';
+    const skuHtml = p.sku  ? `<span class="sh-result-sku">#${p.sku}</span>` : '';
+    const brandHtml = p.brand ? `<span class="sh-result-brand">${p.brand}</span>` : '';
+    const cartDisabled = shLoggedIn ? '' : 'disabled title="Sign in to add to cart"';
+    const nameLink = p.url
+      ? `<a href="${p.url}" target="_blank" style="color:inherit;text-decoration:none" title="View on SupplyHouse.com">${p.name}</a>`
+      : p.name;
+
+    return `<div class="sh-result">
+      ${imgHtml}
+      <div class="sh-result-body">
+        <div class="sh-result-name">${nameLink}</div>
+        <div class="sh-result-meta">${priceHtml}${oosHtml}${skuHtml}${brandHtml}</div>
+      </div>
+      <div class="sh-result-actions">
+        <button class="sh-btn-d" onclick="shAddToDesign(${i})" title="Add to canvas">+ Design</button>
+        <button class="sh-btn-c" id="sh-cart-btn-${i}" onclick="shAddToCart(${i})" ${cartDisabled}>🛒 Cart</button>
+      </div>
+    </div>`;
+  }).join('');
+
+  // Store products on window for button callbacks
+  window._shProducts = products;
+
+  // Pagination
+  const totalPages = Math.ceil(shTotal / 20);
+  if (totalPages > 1) {
+    const pager = document.getElementById('sh-pager');
+    pager.style.display = 'flex';
+    document.getElementById('sh-prev').disabled = shPage_current === 0;
+    document.getElementById('sh-next').disabled = shPage_current >= totalPages - 1;
+    document.getElementById('sh-pager-info').textContent =
+      `Page ${shPage_current + 1} of ${totalPages} (${shTotal} results)`;
+  }
+}
+
+// ── Add to Design (local canvas) ─────────────────────────────────
+function shAddToDesign(idx) {
+  const p = window._shProducts?.[idx];
+  if (!p) return;
+  // Map supply house product to a local catalog item shape
+  const item = {
+    id:      p.id || p.sku || `sh-${Date.now()}`,
+    name:    p.name.length > 22 ? p.name.slice(0, 21) + '…' : p.name,
+    desc:    p.sku ? `SKU: ${p.sku}` : '',
+    price:   p.price || 0,
+    size:    '',
+    unit:    'ea',
+    catIcon: 'fitting',
+    catCol:  '#4a9eff',
+  };
+  // Place near center of current view
+  const wrap = document.getElementById('canvasWrap');
+  const cx = Math.round((wrap.clientWidth  / 2 / scale - 32) / 20) * 20;
+  const cy = Math.round((wrap.clientHeight / 2 / scale - 32) / 20) * 20;
+  addComponent(item, Math.max(0, cx + Math.random() * 80 - 40), Math.max(0, cy + Math.random() * 80 - 40));
+  // Brief flash on button
+  const btn = document.querySelector(`.sh-result:nth-child(${idx + 1}) .sh-btn-d`);
+  if (btn) { btn.textContent = '✓ Added'; btn.style.color = '#4caf50'; setTimeout(() => { btn.textContent = '+ Design'; btn.style.color = ''; }, 1500); }
+}
+
+// ── Add to Cart (SupplyHouse.com) ────────────────────────────────
+async function shAddToCart(idx) {
+  const p = window._shProducts?.[idx];
+  if (!p || !shLoggedIn) return;
+  const btn = document.getElementById(`sh-cart-btn-${idx}`);
+  if (!btn) return;
+  btn.disabled    = true;
+  btn.textContent = '…';
+  try {
+    const r = await fetch(`${API}/api/cart/add`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ productId: p.id, qty: 1 }),
+    });
+    const d = await r.json();
+    if (r.ok && d.success) {
+      btn.textContent = '✓ Added';
+      btn.classList.add('added');
+      shRefreshCartCount();
+      setTimeout(() => { btn.textContent = '🛒 Cart'; btn.classList.remove('added'); btn.disabled = false; }, 2500);
+    } else {
+      btn.textContent = 'Error';
+      btn.disabled = false;
+      shStatus(d.error || 'Add to cart failed', 'err');
+      setTimeout(() => { btn.textContent = '🛒 Cart'; shStatus(''); }, 2500);
+    }
+  } catch {
+    btn.textContent = 'Error';
+    btn.disabled    = false;
+  }
+}
 </script>
 </body>
 </html>
