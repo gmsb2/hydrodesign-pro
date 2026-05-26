@@ -96,9 +96,31 @@
     .bom-table th:nth-child(2),.bom-table td:nth-child(2){text-align:center}
     .bom-table td{padding:4px 6px;border-bottom:1px solid #1a2234}
     .bom-table tr:hover td{background:#1f2d47}
+    .bom-table tr.bom-row-selected td{background:#0e2a16!important}
+    .bom-table tr.bom-row-selected td:first-child{border-left:3px solid #4caf50;padding-left:4px}
     .bom-table .iname{font-weight:500;color:#d8e8f8}
     .bom-table .isize{color:#5a7a9a;font-size:.85em}
     .bom-table .iprice{color:#4caf50}
+    .bom-link{color:#7ab8e8;text-decoration:none}
+    .bom-link:hover{color:#acd4f8;text-decoration:underline}
+
+    /* ── BOM HOVER POPUP ── */
+    #bom-popup{
+      position:fixed;z-index:9999;display:none;
+      width:210px;background:#1a2a3d;border:1px solid #3d6a9a;
+      border-radius:7px;box-shadow:0 6px 20px rgba(0,0,0,.75);
+      padding:10px;pointer-events:none;
+    }
+    #bom-popup .bp-img{width:100%;height:108px;object-fit:contain;
+      border-radius:4px;background:#0d1117;display:block;margin-bottom:7px}
+    #bom-popup .bp-noimg{width:100%;height:80px;background:#0d1117;border-radius:4px;
+      display:flex;align-items:center;justify-content:center;font-size:30px;margin-bottom:7px}
+    #bom-popup .bp-name{color:#cce4ff;font-size:12px;font-weight:600;
+      line-height:1.35;margin-bottom:4px;word-break:break-word}
+    #bom-popup .bp-sku{color:#5a8aaa;font-size:10.5px;margin-bottom:3px}
+    #bom-popup .bp-price{color:#4caf50;font-size:12px;font-weight:700;margin-bottom:4px}
+    #bom-popup .bp-hint{color:#4a7a9a;font-size:10px;border-top:1px solid #1f3a5f;
+      padding-top:5px;margin-top:2px}
     .parts-ftr{padding:10px 13px;border-top:1px solid #1f2d47;flex-shrink:0}
     .tot-row{display:flex;justify-content:space-between;font-size:0.81em;padding:2px 0}
     .tot-row.grand{font-weight:700;font-size:0.92em;color:#4caf50;border-top:1px solid #1f2d47;padding-top:6px;margin-top:4px}
@@ -736,6 +758,8 @@ function addComponent(item, x, y){
     qty: item.unit==='ft'?10:1,
     icon:item.catIcon||'fitting', col:item.catCol||'#4a9eff',
     x, y, w:64, h:64,
+    shUrl: item.shUrl||'',
+    shImg: item.shImg||'',
   };
   components.push(comp);
   mountComponent(comp);
@@ -825,6 +849,7 @@ function selectComp(id){
   document.querySelectorAll('.component').forEach(e=>e.classList.remove('selected'));
   if(id!==null){ document.getElementById(`c${id}`)?.classList.add('selected'); }
   selectedId=id;
+  syncBomHighlight();
 }
 
 function deleteComp(id){
@@ -938,17 +963,52 @@ function updateBOM(){
     tbody.innerHTML='<tr><td colspan="3" style="text-align:center;color:#3a5a7a;padding:22px 0">Drag parts to the canvas</td></tr>';
     setTotals(0); return;
   }
+
+  // Aggregate by itemId
   const agg={};
   components.forEach(c=>{
-    if(!agg[c.itemId]) agg[c.itemId]={name:c.name,size:c.size,price:c.price,unit:c.unit,qty:0,total:0};
-    agg[c.itemId].qty+=c.qty;
-    agg[c.itemId].total+=c.price*c.qty;
+    if(!agg[c.itemId]) agg[c.itemId]={
+      name:c.name, size:c.size, price:c.price, unit:c.unit, qty:0, total:0,
+      shUrl:c.shUrl||'', shImg:c.shImg||''
+    };
+    agg[c.itemId].qty   += c.qty;
+    agg[c.itemId].total += c.price*c.qty;
+    if(!agg[c.itemId].shUrl && c.shUrl) agg[c.itemId].shUrl=c.shUrl;
+    if(!agg[c.itemId].shImg && c.shImg) agg[c.itemId].shImg=c.shImg;
   });
-  tbody.innerHTML=Object.values(agg).map(r=>`<tr>
-    <td><div class="iname">${r.name}</div>${r.size?`<div class="isize">${r.size}</div>`:''}</td>
-    <td>${r.qty}${r.unit!=='ea'?' '+r.unit:''}</td>
-    <td class="iprice">$${r.total.toFixed(2)}</td>
-  </tr>`).join('');
+
+  // Determine which itemId is selected (for highlight)
+  const selItemId = selectedId!==null
+    ? String(components.find(c=>c.id===selectedId)?.itemId ?? '')
+    : '';
+
+  // Build rows
+  tbody.innerHTML = Object.entries(agg).map(([itemId, r])=>{
+    // SH product URL or fallback search URL
+    const url = r.shUrl ||
+      `https://www.supplyhouse.com/search?q=${encodeURIComponent((r.name+' '+(r.size||'')).trim())}`;
+    const isSelected = selItemId && selItemId===String(itemId);
+    const nameEsc = r.name.replace(/"/g,'&quot;');
+    const nameLink = `<a class="bom-link" href="${url}" target="_blank"
+        title="View on SupplyHouse.com" onclick="event.stopPropagation()">${r.name}</a>`;
+    return `<tr class="${isSelected?'bom-row-selected':''}"
+        data-item-id="${itemId}" data-url="${url}"
+        data-img="${r.shImg||''}" data-name="${nameEsc}"
+        data-sku="${itemId}" data-price="${r.price}"
+        onclick="selectFromBom('${itemId}')" style="cursor:pointer">
+      <td><div class="iname">${nameLink}</div>${r.size?`<div class="isize">${r.size}</div>`:''}</td>
+      <td>${r.qty}${r.unit!=='ea'?' '+r.unit:''}</td>
+      <td class="iprice">$${r.total.toFixed(2)}</td>
+    </tr>`;
+  }).join('');
+
+  // Attach hover listeners for popup
+  tbody.querySelectorAll('tr[data-item-id]').forEach(row=>{
+    row.addEventListener('mouseenter', e=>showBomPopup(row,e));
+    row.addEventListener('mousemove',  e=>moveBomPopup(e));
+    row.addEventListener('mouseleave', hideBomPopup);
+  });
+
   const sub=Object.values(agg).reduce((s,r)=>s+r.total,0);
   setTotals(sub);
 }
@@ -958,6 +1018,54 @@ function setTotals(sub){
   document.getElementById('tTax').textContent='$'+tax.toFixed(2);
   document.getElementById('tGrand').textContent='$'+grand.toFixed(2);
   document.getElementById('partsTotal').textContent='$'+sub.toFixed(2);
+}
+
+// ── BOM ↔ Canvas cross-highlight ──────────────────────────────────
+function syncBomHighlight(){
+  const selItemId = selectedId!==null
+    ? String(components.find(c=>c.id===selectedId)?.itemId ?? '')
+    : '';
+  document.querySelectorAll('#bomBody tr[data-item-id]').forEach(row=>{
+    const match = selItemId && row.dataset.itemId===selItemId;
+    row.classList.toggle('bom-row-selected', !!match);
+    if(match) row.scrollIntoView({block:'nearest',behavior:'smooth'});
+  });
+}
+
+function selectFromBom(itemId){
+  const comp=components.find(c=>String(c.itemId)===String(itemId));
+  if(comp){ selectComp(comp.id); }
+}
+
+// ── BOM Hover Popup ───────────────────────────────────────────────
+function showBomPopup(row, e){
+  const pop=document.getElementById('bom-popup');
+  const img=row.dataset.img, name=row.dataset.name;
+  const sku=row.dataset.sku, price=parseFloat(row.dataset.price)||0;
+  const imgHtml = img
+    ? `<img class="bp-img" src="${img}" alt=""
+         onerror="this.outerHTML='<div class=\\'bp-noimg\\'>📦</div>'">`
+    : `<div class="bp-noimg">📦</div>`;
+  const skuDisplay = sku && !sku.startsWith('sh-') && !/^[a-z]+-\d/.test(sku)
+    ? `<div class="bp-sku">SKU: ${sku}</div>` : '';
+  pop.innerHTML=`${imgHtml}
+    <div class="bp-name">${name}</div>
+    ${skuDisplay}
+    ${price?`<div class="bp-price">$${price.toFixed(2)} ea</div>`:''}
+    <div class="bp-hint">🔗 Click name to open on SupplyHouse.com</div>`;
+  moveBomPopup(e);
+  pop.style.display='block';
+}
+function moveBomPopup(e){
+  const pop=document.getElementById('bom-popup');
+  const pw=220, ph=pop.offsetHeight||200;
+  let left=e.clientX-pw-14, top=e.clientY-10;
+  if(left<6) left=e.clientX+14;
+  if(top+ph>window.innerHeight-6) top=window.innerHeight-ph-6;
+  pop.style.left=left+'px'; pop.style.top=top+'px';
+}
+function hideBomPopup(){
+  document.getElementById('bom-popup').style.display='none';
 }
 
 // ═══════════════════════════════════════════════════════════════════
@@ -1638,6 +1746,8 @@ function shAddToDesign(idx) {
     unit:    'ea',
     catIcon: 'fitting',
     catCol:  '#4a9eff',
+    shUrl:   p.url   || '',
+    shImg:   p.image || '',
   };
   // Place near center of current view
   const wrap = document.getElementById('canvasWrap');
@@ -1680,5 +1790,6 @@ async function shAddToCart(idx) {
   }
 }
 </script>
+<div id="bom-popup"></div>
 </body>
 </html>
