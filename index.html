@@ -259,6 +259,27 @@
     .cart-indicator:hover{border-color:#4caf50;color:#4caf50}
     .cart-indicator.has-items{border-color:#4caf50;color:#4caf50}
     .cart-count{background:#4caf50;color:#0d1117;border-radius:9px;padding:0 5px;font-size:.8em;font-weight:700}
+
+    /* ── PIPE LABELS (SVG) ── */
+    .conn-lbl-bg{fill:#1a2535;opacity:.82;rx:3}
+    .conn-lbl-txt{fill:#a0c4e8;font-size:10px;font-family:'Segoe UI',sans-serif;pointer-events:none;dominant-baseline:middle;text-anchor:middle}
+
+    /* ── CANVAS TEXT LABELS ── */
+    .canvas-label{
+      position:absolute;min-width:60px;max-width:200px;padding:4px 8px;
+      background:#1f3a5f;border:1px solid #3d6a9a;border-radius:4px;
+      color:#cce4ff;font-size:12px;font-family:'Segoe UI',sans-serif;
+      cursor:move;user-select:none;z-index:20;white-space:pre-wrap;
+      box-shadow:0 2px 6px rgba(0,0,0,.5);
+    }
+    .canvas-label:focus{outline:2px solid #4caf50;cursor:text;}
+    .canvas-label.selected-label{outline:2px solid #4caf50;}
+    .canvas-label .lbl-del{
+      position:absolute;top:-6px;right:-6px;width:14px;height:14px;
+      background:#c0392b;border-radius:50%;color:#fff;font-size:9px;
+      display:none;align-items:center;justify-content:center;cursor:pointer;line-height:1;
+    }
+    .canvas-label:hover .lbl-del{display:flex;}
   </style>
 </head>
 <body>
@@ -270,6 +291,8 @@
     <button class="tool-btn active" id="toolSelect" onclick="setTool('select')">↖ Select <span class="kbd">S</span></button>
     <button class="tool-btn" id="toolConnect" onclick="setTool('connect')">⟿ Connect <span class="kbd">C</span></button>
     <button class="tool-btn" id="toolDelete" onclick="setTool('delete')">✕ Delete <span class="kbd">D</span></button>
+    <button class="tool-btn" id="toolLabel" onclick="setTool('label')">🏷 Label <span class="kbd">L</span></button>
+    <button class="tool-btn" id="btnPipeLabels" style="margin-left:4px" onclick="togglePipeLabels()" title="Show/hide pipe size labels">⌇ Pipe Labels</button>
     <button class="tool-btn" style="margin-left:8px" onclick="clearCanvas()">⟳ Clear</button>
     <button class="tool-btn green" onclick="exportCSV()">⬇ CSV</button>
     <span id="currentProject" title="Current project"></span>
@@ -628,14 +651,17 @@ function getIcon(iconKey){ return ICONS[iconKey]||ICONS.fitting; }
 // ═══════════════════════════════════════════════════════════════════
 let components = [];
 let connections = [];
+let labels = [];             // canvas text annotation labels
 let nextId = 1;
 let currentTool = 'select';
 let dragData = null;         // catalog item being dragged
 let selectedId = null;
+let selectedLabelId = null;  // selected annotation label
 let connSrc = null;          // {compId, port}
 let pendingConn = null;      // {fromId,fromPort,toId,toPort} waiting for modal
 let scale = 1;
 let isDraggingComp = false;
+let showPipeLabels = true;   // toggle pipe size labels on connections
 
 // ═══════════════════════════════════════════════════════════════════
 //  CATALOG RENDER
@@ -831,7 +857,7 @@ function addConn(fromId,fromPort,toId,toPort,pipeType,pipeSize){
 
 function redrawConns(){
   const svg=document.getElementById('svg-layer');
-  svg.querySelectorAll('.conn-line,.conn-lbl').forEach(e=>e.remove());
+  svg.querySelectorAll('.conn-line,.conn-lbl,.conn-lbl-bg,.conn-lbl-txt').forEach(e=>e.remove());
   connections.forEach(conn=>{
     const fc=components.find(c=>c.id===conn.from), tc=components.find(c=>c.id===conn.to);
     if(!fc||!tc) return;
@@ -853,7 +879,36 @@ function redrawConns(){
       if(currentTool==='delete'){ connections=connections.filter(c=>c.id!==conn.id); redrawConns(); updateStatus(); }
     });
     svg.appendChild(path);
+
+    // ── Pipe label (material + size) ──
+    if(showPipeLabels && conn.pipeSize){
+      const mat = conn.pipeType==='copper'?'Cu':conn.pipeType==='pex'?'PEX':conn.pipeType==='generic'?'':conn.pipeType||'';
+      const txt = mat ? `${conn.pipeSize} ${mat}` : conn.pipeSize;
+      // Label position: midpoint of the first segment
+      let lx, ly;
+      if(Math.abs(dx)>=Math.abs(dy)){ lx=(a.x+mx)/2; ly=a.y-12; }
+      else                           { lx=a.x+5;      ly=(a.y+my)/2; }
+      const PAD=3, TW=txt.length*5.6+PAD*2, TH=14;
+      const g=document.createElementNS('http://www.w3.org/2000/svg','g');
+      g.setAttribute('class','conn-lbl');
+      const bg=document.createElementNS('http://www.w3.org/2000/svg','rect');
+      bg.setAttribute('x',lx-TW/2); bg.setAttribute('y',ly-TH/2);
+      bg.setAttribute('width',TW);  bg.setAttribute('height',TH);
+      bg.setAttribute('rx',3);      bg.setAttribute('class','conn-lbl-bg');
+      const t=document.createElementNS('http://www.w3.org/2000/svg','text');
+      t.setAttribute('x',lx); t.setAttribute('y',ly);
+      t.setAttribute('class','conn-lbl-txt');
+      t.textContent=txt;
+      g.appendChild(bg); g.appendChild(t);
+      svg.appendChild(g);
+    }
   });
+}
+
+function togglePipeLabels(){
+  showPipeLabels=!showPipeLabels;
+  document.getElementById('btnPipeLabels').classList.toggle('active',showPipeLabels);
+  redrawConns();
 }
 
 // Modal confirm/cancel
@@ -939,20 +994,104 @@ function exportCSV(){
 function setTool(t){
   currentTool=t;
   clearConnSrc();
-  ['Select','Connect','Delete'].forEach(n=>document.getElementById('tool'+n)?.classList.remove('active'));
+  ['Select','Connect','Delete','Label'].forEach(n=>document.getElementById('tool'+n)?.classList.remove('active'));
   document.getElementById('tool'+t.charAt(0).toUpperCase()+t.slice(1))?.classList.add('active');
-  const hints={select:'Click to select · Drag to move · Del to remove selected',connect:'Click a port (blue dot) on one component, then another',delete:'Click a component or pipe to delete it'};
-  setHint(hints[t]);
+  const hints={
+    select:'Click to select · Drag to move · Del to remove selected',
+    connect:'Click a port (blue dot) on one component, then another',
+    delete:'Click a component or pipe to delete it',
+    label:'Click anywhere on the canvas to place a text label',
+  };
+  setHint(hints[t]||'');
   document.getElementById('s-tool').textContent='Tool: '+t.charAt(0).toUpperCase()+t.slice(1);
 }
 
 function clearCanvas(){
-  if(!components.length) return;
-  if(!confirm('Clear all components and connections?')) return;
-  components=[]; connections=[];
+  if(!components.length&&!connections.length&&!labels.length) return;
+  if(!confirm('Clear all components, connections and labels?')) return;
+  components=[]; connections=[]; labels=[];
   const outer=document.getElementById('canvas-outer');
   outer.innerHTML='<svg id="svg-layer" xmlns="http://www.w3.org/2000/svg"><defs><marker id="arr" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#3d5a7a"/></marker></defs></svg>';
   updateBOM(); updateStatus();
+}
+
+// ═══════════════════════════════════════════════════════════════════
+//  CANVAS TEXT LABELS
+// ═══════════════════════════════════════════════════════════════════
+function addLabel(x, y, text){
+  const lbl={id:nextId++, x, y, text:text||'Label'};
+  labels.push(lbl);
+  mountLabel(lbl);
+  return lbl;
+}
+
+function mountLabel(lbl){
+  const outer=document.getElementById('canvas-outer');
+  const el=document.createElement('div');
+  el.className='canvas-label';
+  el.id=`lbl${lbl.id}`;
+  el.style.left=lbl.x+'px';
+  el.style.top=lbl.y+'px';
+  el.contentEditable='false';
+  el.textContent=lbl.text;
+
+  // Delete button
+  const del=document.createElement('span');
+  del.className='lbl-del'; del.textContent='✕'; del.title='Delete label';
+  del.addEventListener('mousedown',e=>{ e.stopPropagation(); deleteLabel(lbl.id); });
+  el.appendChild(del);
+
+  // Select / drag in select mode; edit on double-click
+  el.addEventListener('mousedown',e=>{
+    if(currentTool==='delete'){ e.stopPropagation(); deleteLabel(lbl.id); return; }
+    if(e.detail===2) return; // let dblclick handle
+    if(currentTool!=='select') return;
+    e.stopPropagation();
+    // deselect others
+    document.querySelectorAll('.canvas-label').forEach(d=>d.classList.remove('selected-label'));
+    el.classList.add('selected-label');
+    selectedLabelId=lbl.id;
+
+    const startX=e.clientX, startY=e.clientY;
+    const ox=lbl.x, oy=lbl.y;
+    let moved=false;
+    function onMove(ev){
+      moved=true;
+      lbl.x=ox+(ev.clientX-startX)/scale;
+      lbl.y=oy+(ev.clientY-startY)/scale;
+      el.style.left=lbl.x+'px'; el.style.top=lbl.y+'px';
+    }
+    function onUp(){
+      document.removeEventListener('mousemove',onMove);
+      document.removeEventListener('mouseup',onUp);
+    }
+    document.addEventListener('mousemove',onMove);
+    document.addEventListener('mouseup',onUp);
+  });
+
+  el.addEventListener('dblclick',e=>{
+    if(currentTool!=='select') return;
+    e.stopPropagation();
+    el.contentEditable='true'; el.focus();
+    const range=document.createRange(); range.selectNodeContents(el); range.collapse(false);
+    const sel=window.getSelection(); sel.removeAllRanges(); sel.addRange(range);
+  });
+  el.addEventListener('blur',()=>{
+    el.contentEditable='false';
+    lbl.text=el.innerText||'Label';
+  });
+  el.addEventListener('keydown',e=>{
+    if(e.key==='Escape'||e.key==='Enter'&&!e.shiftKey){ el.blur(); e.preventDefault(); }
+    e.stopPropagation();
+  });
+
+  outer.appendChild(el);
+}
+
+function deleteLabel(id){
+  labels=labels.filter(l=>l.id!==id);
+  document.getElementById('lbl'+id)?.remove();
+  if(selectedLabelId===id) selectedLabelId=null;
 }
 
 // ═══════════════════════════════════════════════════════════════════
@@ -991,24 +1130,52 @@ function setHint(t){ document.getElementById('s-hint').textContent=t; }
 //  KEYBOARD SHORTCUTS
 // ═══════════════════════════════════════════════════════════════════
 document.addEventListener('keydown',e=>{
-  if(document.activeElement.tagName==='INPUT'||document.activeElement.tagName==='SELECT') return;
+  const active=document.activeElement;
+  if(active.tagName==='INPUT'||active.tagName==='SELECT') return;
+  // Allow editing inside a canvas label
+  if(active.classList&&active.classList.contains('canvas-label')&&active.contentEditable==='true') return;
   switch(e.key){
     case 'Escape': setTool('select'); break;
     case 's': case 'S': setTool('select'); break;
     case 'c': case 'C': if(!e.ctrlKey&&!e.metaKey) setTool('connect'); break;
     case 'd': case 'D': setTool('delete'); break;
+    case 'l': case 'L': setTool('label'); break;
     case 'Delete': case 'Backspace':
-      if(selectedId!==null){ deleteComp(selectedId); selectedId=null; } break;
+      if(selectedLabelId!==null){ deleteLabel(selectedLabelId); }
+      else if(selectedId!==null){ deleteComp(selectedId); selectedId=null; }
+      break;
   }
 });
 
-// Deselect on canvas background click
+// Deselect on canvas background click; place label in label mode
 document.getElementById('canvasWrap').addEventListener('mousedown',e=>{
-  if(e.target===document.getElementById('canvasWrap')||e.target===document.getElementById('canvas-outer')||e.target===document.getElementById('svg-layer')){
+  const onBg=e.target===document.getElementById('canvasWrap')||e.target===document.getElementById('canvas-outer')||e.target===document.getElementById('svg-layer');
+  if(onBg){
+    // Deselect labels
+    document.querySelectorAll('.canvas-label').forEach(d=>d.classList.remove('selected-label'));
+    selectedLabelId=null;
     selectComp(null);
     clearConnSrc();
+    if(currentTool==='label'){
+      // Place annotation label at click position in canvas-outer coords
+      const outer=document.getElementById('canvas-outer');
+      const rect=outer.getBoundingClientRect();
+      const x=(e.clientX-rect.left)/scale;
+      const y=(e.clientY-rect.top)/scale;
+      const lbl=addLabel(x-30, y-12);
+      // Auto-focus for immediate editing
+      setTimeout(()=>{
+        const el=document.getElementById('lbl'+lbl.id);
+        if(el){ el.contentEditable='true'; el.focus(); selectAll(el); }
+      },30);
+    }
   }
 });
+
+function selectAll(el){
+  const r=document.createRange(); r.selectNodeContents(el);
+  const s=window.getSelection(); s.removeAllRanges(); s.addRange(r);
+}
 
 // ═══════════════════════════════════════════════════════════════════
 //  PROJECT SAVE / LOAD
@@ -1017,7 +1184,11 @@ let currentProjectId   = null;
 let currentProjectName = '';
 
 function getCanvasState() {
-  return { components: components.map(c => ({...c})), connections: connections.map(c => ({...c})) };
+  return {
+    components: components.map(c => ({...c})),
+    connections: connections.map(c => ({...c})),
+    labels: labels.map(l => ({...l})),
+  };
 }
 
 function getBomParts() {
@@ -1031,7 +1202,7 @@ function getBomParts() {
 
 function restoreCanvasState(state) {
   // Silent clear
-  components = []; connections = [];
+  components = []; connections = []; labels = [];
   const outer = document.getElementById('canvas-outer');
   outer.innerHTML = '<svg id="svg-layer" xmlns="http://www.w3.org/2000/svg"><defs><marker id="arr" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#3d5a7a"/></marker></defs></svg>';
   nextId = 1;
@@ -1039,11 +1210,16 @@ function restoreCanvasState(state) {
   const parsed = typeof state === 'string' ? JSON.parse(state) : state;
   const comps  = parsed?.components || [];
   const conns  = parsed?.connections || [];
-  const maxId  = Math.max(0, ...comps.map(c=>c.id||0), ...conns.map(c=>c.id||0));
+  const lbls   = parsed?.labels     || [];
+  const maxId  = Math.max(0,
+    ...comps.map(c=>c.id||0),
+    ...conns.map(c=>c.id||0),
+    ...lbls.map(l=>l.id||0));
   nextId = maxId + 1;
 
   comps.forEach(c => { components.push(c); mountComponent(c); });
   conns.forEach(c => { connections.push(c); });
+  lbls.forEach(l  => { labels.push(l);     mountLabel(l); });
   redrawConns(); updateBOM(); updateStatus();
 }
 
