@@ -754,6 +754,7 @@ function onDrop(e){
 function addComponent(item, x, y){
   const comp={
     id: nextId++, itemId:item.id, name:item.name,
+    fullName: item.fullName || item.name,   // untruncated name for URLs / BOM
     price:item.price, size:item.size||'', unit:item.unit||'ea',
     qty: item.unit==='ft'?10:1,
     icon:item.catIcon||'fitting', col:item.catCol||'#4a9eff',
@@ -968,7 +969,8 @@ function updateBOM(){
   const agg={};
   components.forEach(c=>{
     if(!agg[c.itemId]) agg[c.itemId]={
-      name:c.name, size:c.size, price:c.price, unit:c.unit, qty:0, total:0,
+      name:c.name, fullName:c.fullName||c.name,
+      size:c.size, price:c.price, unit:c.unit, qty:0, total:0,
       shUrl:c.shUrl||'', shImg:c.shImg||''
     };
     agg[c.itemId].qty   += c.qty;
@@ -984,13 +986,15 @@ function updateBOM(){
 
   // Build rows
   tbody.innerHTML = Object.entries(agg).map(([itemId, r])=>{
-    // SH product URL or fallback search URL
+    // SH product URL or fallback search URL (always use fullName — never the truncated display name)
+    const searchTerm = (r.fullName+' '+(r.size||'')).trim();
     const url = r.shUrl ||
-      `https://www.supplyhouse.com/search?q=${encodeURIComponent((r.name+' '+(r.size||'')).trim())}`;
+      `https://www.supplyhouse.com/search?q=${encodeURIComponent(searchTerm)}`;
     const isSelected = selItemId && selItemId===String(itemId);
-    const nameEsc = r.name.replace(/"/g,'&quot;');
+    const displayName = r.fullName || r.name;
+    const nameEsc = displayName.replace(/"/g,'&quot;');
     const nameLink = `<a class="bom-link" href="${url}" target="_blank"
-        title="View on SupplyHouse.com" onclick="event.stopPropagation()">${r.name}</a>`;
+        title="View on SupplyHouse.com" onclick="event.stopPropagation()">${displayName}</a>`;
     return `<tr class="${isSelected?'bom-row-selected':''}"
         data-item-id="${itemId}" data-url="${url}"
         data-img="${r.shImg||''}" data-name="${nameEsc}"
@@ -1739,7 +1743,8 @@ function shAddToDesign(idx) {
   // Map supply house product to a local catalog item shape
   const item = {
     id:      p.id || p.sku || `sh-${Date.now()}`,
-    name:    p.name.length > 22 ? p.name.slice(0, 21) + '…' : p.name,
+    name:     p.name.length > 22 ? p.name.slice(0, 21) + '…' : p.name,
+    fullName: p.name,   // untruncated — used for URLs and BOM display
     desc:    p.sku ? `SKU: ${p.sku}` : '',
     price:   p.price || 0,
     size:    '',
