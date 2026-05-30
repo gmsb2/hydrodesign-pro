@@ -20,6 +20,7 @@
     .tool-btn.active{background:#e94560;border-color:#e94560;color:#fff}
     .tool-btn.green{background:#1b4d2e;border-color:#2e7d4f;color:#4caf50}
     .tool-btn.green:hover{background:#2e7d4f}
+    .tool-btn:disabled{opacity:.35;cursor:default;pointer-events:none}
     .kbd{font-size:0.75em;opacity:.6;margin-left:3px}
 
     /* ── MAIN ── */
@@ -314,6 +315,7 @@
     <button class="tool-btn" id="toolConnect" onclick="setTool('connect')">⟿ Connect <span class="kbd">C</span></button>
     <button class="tool-btn" id="toolDelete" onclick="setTool('delete')">✕ Delete <span class="kbd">D</span></button>
     <button class="tool-btn" id="toolLabel" onclick="setTool('label')">🏷 Label <span class="kbd">L</span></button>
+    <button class="tool-btn" id="btnDuplicate" onclick="duplicateSelected()" disabled title="Duplicate selected component (Ctrl+D)">⧉ Duplicate</button>
     <button class="tool-btn" id="btnPipeLabels" style="margin-left:4px" onclick="togglePipeLabels()" title="Show/hide pipe size labels">⌇ Pipe Labels</button>
     <button class="tool-btn" style="margin-left:8px" onclick="clearCanvas()">⟳ Clear</button>
     <button class="tool-btn green" onclick="exportCSV()">⬇ CSV</button>
@@ -850,6 +852,7 @@ function selectComp(id){
   document.querySelectorAll('.component').forEach(e=>e.classList.remove('selected'));
   if(id!==null){ document.getElementById(`c${id}`)?.classList.add('selected'); }
   selectedId=id;
+  document.getElementById('btnDuplicate').disabled = (id===null);
   syncBomHighlight();
 }
 
@@ -858,6 +861,23 @@ function deleteComp(id){
   connections=connections.filter(cn=>cn.from!==id&&cn.to!==id);
   document.getElementById(`c${id}`)?.remove();
   redrawConns(); updateBOM(); updateStatus();
+}
+
+function duplicateSelected(){
+  if(selectedId===null) return;
+  const src=components.find(c=>c.id===selectedId);
+  if(!src) return;
+  // Offset by 24 px (snaps to 20-px grid → 20)
+  const copy={
+    ...src,
+    id: nextId++,
+    x: src.x+20,
+    y: src.y+20,
+  };
+  components.push(copy);
+  mountComponent(copy);
+  selectComp(copy.id);   // select the new copy
+  updateBOM(); updateStatus();
 }
 
 // ═══════════════════════════════════════════════════════════════════
@@ -1250,7 +1270,10 @@ document.addEventListener('keydown',e=>{
     case 'Escape': setTool('select'); break;
     case 's': case 'S': setTool('select'); break;
     case 'c': case 'C': if(!e.ctrlKey&&!e.metaKey) setTool('connect'); break;
-    case 'd': case 'D': setTool('delete'); break;
+    case 'd': case 'D':
+      if(e.ctrlKey||e.metaKey){ e.preventDefault(); duplicateSelected(); }
+      else setTool('delete');
+      break;
     case 'l': case 'L': setTool('label'); break;
     case 'Delete': case 'Backspace':
       if(selectedLabelId!==null){ deleteLabel(selectedLabelId); }
@@ -1507,11 +1530,13 @@ async function invAddFromBom() {
   loadInventory();
 }
 
-// ── Patch addComponent + deleteComp to mark unsaved ─────────────
+// ── Patch addComponent + deleteComp + duplicateSelected to mark unsaved ──
 const _origAdd = addComponent;
 addComponent = function(...a){ _origAdd(...a); markUnsaved(); };
 const _origDel = deleteComp;
 deleteComp = function(...a){ _origDel(...a); markUnsaved(); };
+const _origDup = duplicateSelected;
+duplicateSelected = function(...a){ _origDup(...a); markUnsaved(); };
 
 // ═══════════════════════════════════════════════════════════════════
 //  INIT
